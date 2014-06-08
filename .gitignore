@@ -1,3 +1,12 @@
+## Something sepcial in this project(SIMM)
+sections/*.aux
+sections/*.lof
+sections/*.log
+sections/*.lot
+sections/*.fls
+sections/*.out
+sections/*.toc
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
@@ -10,9 +19,9 @@
 ## Intermediate documents:
 *.dvi
 # these rules might exclude image files for figures etc.
-# *.ps
-# *.eps
-# *.pdf
+*.ps
+*.eps
+*.pdf
 
 ## Bibliography auxiliary files (bibtex/biblatex/biber):
 *.bbl
@@ -76,6 +85,8 @@
 *.sagetex.sage
 *.sagetex.py
 *.sagetex.scmd
+*.sagetex.sout
+sage-plots-for-*.tex/
 
 # sympy
 *.sout
