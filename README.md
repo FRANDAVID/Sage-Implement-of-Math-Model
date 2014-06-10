@@ -1,6 +1,6 @@
 数学模型的Sage实现
 ==================
-本书籍包含以下内容
+本书籍包含以下内容  
 1. 混合整数线性规划  
 2. 非线性规划  
 3. 动态规划  
@@ -45,7 +45,7 @@ cd Sage-Implement-of-Math-Model && make
 SageCloud：  
 登录[SageCloud](https://cloud.sagemath.com/)，
 新建一个Terminal并输入以下代码，然后可以在file里看到Sage-Implement-of-Math-Model.pdf文件
-~~~shell
+~~~bash
 git clone https://github.com/CAU-Free-Software-Club/Sage-Implement-of-Math-Model
 cd Sage-Implement-of-Math-Model && make
 ~~~
