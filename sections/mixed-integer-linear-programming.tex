@@ -10,8 +10,33 @@ $c\in\mathbb{R}^n$，$x\in\mathbb{R}^n$。
 可令$x_0=u-v$，其中$u,v$具有非负限制即可。
 
 \subsection{Sage实现}
-假如我们要求解下面的整数规划问题：\\
-约束条件为
+\subsubsection{线性规划}
+假设有一个线性规划模型，要求目标函数$-4x_1-5x_2$的最小值，约束条件为
+\[
+\begin{array}{rcl}
+2x_1+x_2 &\leq& 3\\
+x_1+2x_2 &\leq& 3\\
+x_1 &\geq& 0\\
+x_2 &\geq& 0
+\end{array}
+\]
+其中$x_1,x_2$均为实数，
+用$c$记录目标函数的系数向量，$G$记录约束条件的系数矩阵，
+$h$记录约束条件的常数向量，使用如下代码即可求解，其中RDF表示系数为实数
+\begin{sageblock}
+c=vector(RDF,[-4,-5])
+G=matrix(RDF,[[2,1],[1,2],[-1,0],[0,-1]])
+h=vector(RDF,[3,3,0,0])
+sol=linear_program(c,G,h)
+\end{sageblock}
+求解结果当$(x_1,x_2)$取值为$\textrm{sol['x']}=\sage{sol['x']}$时，
+目标函数取得最小值$\sage{-4*sol['x'][0]-5*sol['x'][1]}$。
+如下图，图中红点为最小值点
+
+\sageplot[width=\textwidth]{polygon([(0,0),(0,3/2),(1,1),(3/2,0)])+line([(-1,13/5),(4,-7/5)])+point((sol['x'][0],sol['x'][1]),rgbcolor='red',pointsize=100)}
+
+\subsubsection{混合整数线性规划}
+假如我们要求解下面的整数规划问题，要求目标函数$w_3$的最小值，约束条件为
 \[
 \begin{array}{lcr}
 w_0+w_1+w_2-14w_3&==&0\\
@@ -21,7 +46,7 @@ w_0-w_1-w_2        &>=&0\\
 w_3                  &>=&1
 \end{array}
 \]
-目标函数$w_3$，其中$w_i,i=0,1,2,3$都是整数,则我们可以用以下代码求解这个问题：
+其中$w_i,i=0,1,2,3$都是整数,则我们可以用以下代码求解这个问题
 \begin{sageblock}
 p=MixedIntegerLinearProgram(maximization=False,solver="GLPK")
 w=p.new_variable(integer=True)
@@ -34,12 +59,11 @@ p.add_constraint(w[3]>=1)
 _=[p.set_min(w[i],None) for i in range(0.4)]
 p.set_objective(w[3])
 
-obj=p.solve()
-var=['w_'+str(i)+'='+str(v) for i,v in p.get_values(w).iteritems()]
+objective=p.solve()
+variables=['w_'+str(i)+'='+str(v) for i,v in p.get_values(w).iteritems()]
 \end{sageblock}
-\sageplot[width=\textwidth]{plot(sin,-2*pi,2*pi)}
 
-最后求解结果如下
-\[obj=\sage{obj}\]
-\[var=\sage{var}\]
+求解结果如下
+\[\textrm{objective}=\sage{objective}\]
+\[\textrm{variables}=\sage{variables}\]
 

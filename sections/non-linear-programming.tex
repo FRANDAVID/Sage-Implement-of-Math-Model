@@ -1,4 +1,73 @@
 \section{非线性规划}
 \subsection{描述}
+非线性规划和线性规划都是优化问题，
+但因其目标函数和约束条件的非线性使得问题变异常复杂，
+目前非线性规划尚没有统一的高效解法，
+并且非线性规划还会出现线性规划不会出现的困难，
+即局部最优解与全局最优解不一致。
+一般的线性规划可以表示成以下形式
+\[min\{f(x)|g(x)\leq 0\}\]
+
 \subsection{Sage实现}
+\subsubsection{无约束极值问题}
+假设我们要求函数$f(x,y)=100(y-x^2)^2+(1-x)^2$的极小值，
+可以用Sage的minimize函数，代码如下
+\begin{sageblock}
+f(x,y)=100*(y-x^2)^2+(1-x)^2
+minimum=minimize(f,[0.0,0.0],disp=0)
+\end{sageblock}
+求解结果当$(x,y)=\sage{minimum}$时，
+函数取得极小值$\sage{f(minimum[0],minimum[1])}$，
+如下图，图中红点为极小值点
+
+\sageplot[width=\textwidth]{plot3d(f(x,y),(x,0,2),(y,0,2),opacity=0.7)+point((minimum[0],minimum[1],f(minimum[0],minimum[1])),rgbcolor='red')}
+
+\subsubsection{一维搜索问题}
+假设我们要求函数$f(x)=x\cos(x)$在区间$[0,5]$上的极值（局部最优解），
+可以用Sage的find\_local\_maximum或find\_local\_minimum，
+这里用find\_local\_maximum计算函数的极大值，代码如下
+\begin{sageblock}
+f(x)=x*cos(x)
+maximum=find_local_maximum(f,0,5)
+\end{sageblock}
+求解结果当$x=\sage{maximum[1]}$时，
+函数取得极大值$\sage{maximum[0]}$，
+如下图，图中红点为极大值点
+
+\sageplot[width=\textwidth]{plot(f,0,5)+point((maximum[1],maximum[0]),rgbcolor='red',pointsize=100)}
+
+\subsubsection{约束极值问题}
+假设我们要求函数$f(x_1,x_2)=x_1^2+x_2^2+8$在下面约束条件下的极小值。
+\[
+\begin{array}{rcl}
+x_1^2-x_2 &\geq& 0\\
+-x_1-x_2^2+2 &=& 0\\
+x_1,x_2 &\geq& 0
+\end{array}
+\]
+首先将上述约束条件化成标准形式$g_i(x_1,x_2)\geq 0$。
+\[
+\begin{array}{rcl}
+x_1^2-x_2 &\geq& 0\\
+-x_1-x_2^2+2 &\geq& 0\\
+x_1+x_2^2-2 &\geq& 0\\
+x_1 &\geq& 0\\
+x_2 &\geq& 0
+\end{array}
+\]
+使用如下代码即可求解
+\begin{sageblock}
+f=lambda x:x[0]^2+x[1]^2+8
+a=[lambda x:x[0]^2-x[1],
+lambda x:-x[0]-x[1]^2+2,
+lambda x:x[0]+x[1]^2-2,
+lambda x:x[0],
+lambda x:x[1]
+]
+b=minimize_constrained(f,a,[0,0])
+\end{sageblock}
+最终求解结果函数在$\sage{b}$处取得极小值$\sage{f(b)}$。
+如下图，图中红点为极小值点，此处恰为最小值点
+
+\sageplot[width=\textwidth]{circle((0,0),sqrt(b[0]^2+b[1]^2))+plot(lambda x:sqrt(2-x),(1,2))+point((b[0],b[1]),rgbcolor='red',pointsize=100)}
 

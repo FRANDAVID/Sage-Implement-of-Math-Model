@@ -1,4 +1,40 @@
 \section{插值与拟合}
 \subsection{描述}
+内插是数学领域数值分析中的通过已知的离散数据求未知数据的过程或方法。
+
+科学和工程问题可以通过诸如采样、实验等方法获得若干离散的数据，根据这些数据，
+我们往往希望得到一个连续的函数（也就是曲线）
+或者更加密集的离散方程与已知数据相吻合。
+这个过程叫做拟合。内插是曲线必须通过已知点的拟合。
+
 \subsection{Sage实现}
+\subsubsection{样条插值}
+Sage实现样条插值可以使用spline函数，
+如下面的代码，将要进行插值的样本点列表传给spline函数即可，
+\begin{sageblock}
+s=spline([(0,1),(1,2),(4,5),(5,3)])
+\end{sageblock}
+之后可以通过$s(x)$求得插值后$x$点处的函数值，
+例如$x=1.5$时插值得到的函数为$s(1.5)=\sage{s(1.5)}$。
+如下图，红色点为样本点，黄色点为插值后$x=1.5$处函数图像上一点，
+蓝色曲线为插值曲线。
+
+\sageplot[width=\textwidth]{point([(0,1),(1,2),(4,5),(5,3)],rgbcolor='red',pointsize=100)+point([(x,s(x)) for x in srange(0,5,0.01)])+point((1.5,s(1.5)),rgbcolor='yellow',pointsize=100)}
+
+\subsubsection{拟合}
+Sage实现拟合可以使用find\_fit函数，
+例如我们有一组数据$(x_i,y_i),i=1,2,\cdots,n$，
+要用$y=a\sin(bx-c)$拟合，其中$a,b,c$是待求参数，
+则可以用以下代码求解
+\begin{sageblock}
+data=[(x,1.2*sin(0.5*x-0.2)+0.1*normalvariate(0,1)) for x in srange(0,4*pi,0.2)]
+a,b,c,x=var('a,b,c,x')
+model(x)=a*sin(b*x-c)
+fit=find_fit(data,model)
+\end{sageblock}
+
+最后拟合结果为$\sage{fit}$，
+拟合的曲线与原数据的散点图如下
+
+\sageplot[width=\textwidth]{plot(a.substitute(fit[0])*sin(b.substitute(fit[1])*x-c.substitute(fit[2])),0,4*pi)+point(data)}
 
