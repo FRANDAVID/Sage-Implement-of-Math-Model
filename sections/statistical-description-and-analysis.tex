@@ -1,4 +1,375 @@
 \section{统计描述与分析}
 \subsection{描述}
+统计学是以概率论为基础的一门应用学科。
+这里简单介绍Sage的概率论模块以及简单的统计量计算函数，
+包括Sage内置的常见分布，正态分布、$\chi^2$分布、$t$分布、$F$分布等，
+以及Sage计算均值、方差等的函数。
+最后用Sage的R接口进行更进一步的统计分析，
+解决参数估计、假设检验问题和分布拟合检验问题等。
+
 \subsection{Sage实现}
+这部分内容主要参考一下链接
+
+\href{http://www.sagemath.org/doc/reference/probability/sage/gsl/probability\_distribution.html}{http://www.sagemath.org/doc/reference/probability/sage/gsl/probability\_distribution.html}
+
+\href{http://www.sagemath.org/doc/reference/probability/sage/probability/random\_variable.html}{http://www.sagemath.org/doc/reference/probability/sage/probability/random\_variable.html}
+
+\href{http://www.sagemath.org/doc/reference/stats/sage/stats/basic\_stats.html}{http://www.sagemath.org/doc/reference/stats/sage/stats/basic\_stats.html}
+
+\href{http://www.sagemath.org/doc/reference/stats/sage/stats/intlist.html}{http://www.sagemath.org/doc/reference/stats/sage/stats/intlist.html}
+
+\subsubsection{离散型随机变量分布列}
+GeneralDiscreteDistrubution函数接受一个数列$[a_0,\cdots,a_n]$，
+返回一个分布列$P(X=i)=\frac{a_i}{a_0+\cdots+a_n},i=0,1,2,\cdots,n$。
+如下代码建立一个离散随机变量的分布列并赋值给X
+\begin{sageblock}
+P=[0.3,0.4,0.5]
+X=GeneralDiscreteDistribution(P)
+\end{sageblock}
+通过X.get\_random\_element()可以产生满足上述分布列的随机数。
+例如下面的代码产生一个长度为10的服从上述分布列的随机数列
+\begin{sageblock}
+random_series=[X.get_random_element() for _ in range(10)]
+\end{sageblock}
+结果如下
+\[\textrm{random\_series}=\sage{random_series}\]
+还可以使用generate\_histogram\_plot(filename)函数生成满足上述分布的一组随机样本的频率分布直方图并保存到filename（一个文件）中，
+生成的直方图大致如下
+
+\sageplot[width=\textwidth]{bar_chart(X.generate_histogram_data()[0],axes=False)}
+
+\subsubsection{连续型随机变量分布}
+RealDistribution函数接受两个参数，一个为代表分布类型的字符串，一个为对应分布的参数列。
+Sage提供了均匀分布、高斯分布（正态分布）、瑞利分布、对数正态分布、Pareto分布、t分布、
+F分布、$\chi^2$分布、指数分布、Beta分布、weibull分布的定义。
+\begin{sageblock}
+uniform_dis=RealDistribution('uniform',[0,1])
+gaussian_dis=RealDistribution('gaussian',1)
+rayleigh_dis=RealDistribution('rayleigh',1)
+lognormal_dis=RealDistribution('lognormal',[0,1])
+pareto_dis=RealDistribution('pareto',[1,1])
+t_dis=RealDistribution('t',1)
+f_dis=RealDistribution('F',[1,1])
+chisquared_dis=RealDistribution('chisquared',1)
+exppow_dis=RealDistribution('exppow',[1,1])
+beta_dis=RealDistribution('beta',[1,1])
+weibull_dis=RealDistribution('weibull',[1,1])
+\end{sageblock}
+每种分布均提供了密度函数distribution\_function，
+分布函数cum\_distribution\_function，
+逆分布函数（即分布函数的反函数用来计算分位点）cum\_distribution\_function，
+随机数函数get\_random\_element，
+设置分布函数set\_distribution。
+要获得满足一定分布的随机变量还可以使用以下函数：\\
+uniform，gauss，lognormvariate，paretovariate，
+expovariate，betavariate，weibullvariate。
+
+如果要绘制上述某个分布如weibull分布的图像，只需要weibull\_dis.plot()，结果如下
+
+\sageplot[width=\textwidth]{weibull_dis.plot()}
+
+\subsubsection{球面分布}
+SphericalDistribution函数接受一个dimension函数（默认为3），
+返回n维欧氏空间的n-1维球面上的均匀分布。
+如下代码定义了2维欧氏空上的1维球面上的均匀分布，
+也即平面上均匀的圆周分布
+\begin{sageblock}
+T=SphericalDistribution(dimension=2)
+\end{sageblock}
+此后可以用T.get\_random\_element获得均匀分布的球面点坐标，
+如下图是随机生成的100个平面上均匀圆周分布的点绘成的
+
+\sageplot[width=\textwidth]{point([T.get_random_element() for _ in range(100)])}
+
+\subsubsection{基本统计量}
+Sage提供以下函数用于计算基本统计量，如均值、中位数、众数、标准差、方差、
+最大值、最小值、累乘积、累加和：\\
+mean，median，mode，std，variance，max，min，prod，sum。
+
+还提供了moving\_average用于平整数据，具体用法help(函数名)进行查询。
+
+\subsection{Sage的R接口}
+可以看到Sage自身提供的概率及统计功能比较有限，
+好在Sage内置了R语言并且提供了R的接口。
+其实只要键入r.console()即可进入R的终端环境，
+脱离Sage，但那便属于R的范畴了，
+使用R的Sage接口可以让R和Sage的其他模块方便地合作，
+组合出更强力的模型，因此下面主要讲R的Sage接口。
+这部分内容主要参考以下链接
+
+\href{http://www.sagemath.org/doc/reference/interfaces/sage/interfaces/r.html}{http://www.sagemath.org/doc/reference/interfaces/sage/interfaces/r.html}
+
+\subsubsection{基本统计量}
+在Sage中生成一个R语言的对象主要是使用r()，
+其中括号内填入一个Sage对象或者填入一个字符串（R语言的代码），
+将返回一个R语言的对象。
+反过来如果要将一个R语言的对象转换为Sage对象可以使用对象的\_sage\_方法。
+如下面的代码将一个Sage列表转化为R语言的向量，并赋值给变量x
+\begin{sageblock}
+x=r([75.0,64.0,47.4,66.9,62.2,62.2,58.7,63.5,
+66.6,64.0,57.0,69.0,56.9,50.0,72.0])
+\end{sageblock}
+下面是摘自《统计建模与R软件》的R语言代码
+\begin{lstlisting}
+data_outline <- function(x){
+   n <- length(x)
+   m <- mean(x)
+   v <- var(x)
+   s <- sd(x)
+   me <- median(x)
+   cv <- 100*s/m
+   css <- sum((x-m)^2)
+   uss <- sum(x^2)
+   R <-  max(x)-min(x)
+   R1 <- quantile(x,3/4)-quantile(x,1/4)
+   sm <- s/sqrt(n)
+   g1 <- n/((n-1)*(n-2))*sum((x-m)^3)/s^3
+   g2 <- ((n*(n+1))/((n-1)*(n-2)*(n-3))*sum((x-m)^4)/s^4
+          - (3*(n-1)^2)/((n-2)*(n-3)))
+   data.frame(N=n, Mean=m, Var=v, std_dev=s, Median=me, 
+        std_mean=sm, CV=cv, CSS=css, USS=uss, R=R, 
+        R1=R1, Skewness=g1, Kurtosis=g2, row.names=1)
+}
+\end{lstlisting}
+将上述代码保存到文本文件中，并命名为data\_outline.R，
+然后使用以下Sage代码，即可获得样本x的各类统计量
+\begin{sageblock}
+r.read('data_outline.R')
+result=r.call('data_outline',x)
+\end{sageblock}
+
+结果如下
+
+\begin{tabular}{lll}
+\hline
+统计量 & 代码 & 结果 \\
+\hline
+均值 & result.\_sage\_()['DATA']['Mean'] & $\sage{result._sage_()['DATA']['Mean']}$ \\
+中位数 & result.\_sage\_()['DATA']['Median'] & $\sage{result._sage_()['DATA']['Median']}$ \\
+方差 & result.\_sage\_()['DATA']['Var'] & $\sage{result._sage_()['DATA']['Var']}$ \\
+标准差 & result.\_sage\_()['DATA']['std\_dev'] & $\sage{result._sage_()['DATA']['std_dev']}$ \\
+标准误 & result.\_sage\_()['DATA']['std\_mean'] & $\sage{result._sage_()['DATA']['std_mean']}$ \\
+变异系数 & result.\_sage\_()['DATA']['CV'] & $\sage{result._sage_()['DATA']['CV']}$ \\
+校正平方和 & result.\_sage\_()['DATA']['CSS'] & $\sage{result._sage_()['DATA']['CSS']}$ \\
+未校正平方和 & result.\_sage\_()['DATA']['USS'] & $\sage{result._sage_()['DATA']['USS']}$ \\
+极差 & result.\_sage\_()['DATA']['R'] & $\sage{result._sage_()['DATA']['R']}$ \\
+半极差 & result.\_sage\_()['DATA']['R1'] & $\sage{result._sage_()['DATA']['R1']}$ \\
+峰度系数 & result.\_sage\_()['DATA']['Skewness'] & $\sage{result._sage_()['DATA']['Skewness']}$ \\
+偏度系数 & result.\_sage\_()['DATA']['Kurtosis'] & $\sage{result._sage_()['DATA']['Kurtosis']}$\\
+\hline
+\end{tabular}
+
+\subsubsection{常见分布}
+R语言提供如下常见分布
+
+\begin{tabular}{lll}
+\hline
+分布 & R中名称 & 参数 \\
+\hline
+beta & beta & shape1,shape2,ncp \\
+binomial & binom & size,prob \\
+Cauchy & cauchy & location,scale \\
+chi-squared & chisq & df,ncp \\
+exponential & exp & rate \\
+F & f & df1,df2,ncp \\
+gamma & gamma & shape,scale \\
+geometric & geom & prob \\
+hypergeometric & hyper & m,n,k \\
+log-normal & lnorm & meanlog,sdlog \\
+logistic & logis & location,scale \\
+negative binomial & nbinomial & size,prob \\
+normal & norm & mean,sd \\
+Poisson & pois & lambda \\
+Student's t & t & df,ncp \\
+uniform & unif & min,max \\
+Weibull & weibull & shape,scale \\
+Wilcoxon & wilcox & m,n \\
+\hline
+\end{tabular}
+
+上表中各分布在R中的名称加上前缀d，p，q，r分别表示
+概率密度函数或分布律，分布函数，分布函数的反函数，仿真（产生服从对应分布的随机数）。
+例如以下代码，分别计算了标准正态分布在原点处的密度函数和分布函数的值，
+0.5分位点的值，以及生成了四个服从标准正态分布的随机数
+\begin{sageblock}
+dzero=r.dnorm(0)
+pzero=r.pnorm(0)
+qhalf=r.qnorm(0.5)
+rfour=r.rnorm(4)
+\end{sageblock}
+结果如下
+\[
+\begin{array}{c}
+\textrm{dzero}=\frac{1}{\sqrt{2\pi}}=\sage{dzero._sage_()}\\
+\textrm{pzero}=\sage{pzero._sage_()}\\
+\textrm{qhalf}=\sage{qhalf._sage_()}\\
+\textrm{rfour}=\sage{rfour._sage_()}
+\end{array}
+\]
+
+\subsubsection{正态性检验与分布拟合检验}
+利用Shapiro-Wilk W统计量作正态性检验的方法成为正态W检验方法。
+R语言提供shapiro.test函数计算Shapiro-Wilk W统计量和相应的p值，
+在Sage中为r.shapiro\_test。
+当函数返回的p值小于某个显著性水平如0.05时，
+认为样本不是来自正态分布的总体，否则承认样本来自正态总体。
+其中被测试的样本容量必须大于3小于5000。
+如下Sage代码对上一小节中的样本x进行了正态W检验。
+\begin{sageblock}
+wtest=r.shapiro_test(x)
+\end{sageblock}
+最后检验结果的p值为
+\[\textrm{wtest.\_sage\_()['DATA']['p\_value']}=\sage{wtest._sage_()['DATA']['p_value']}\]
+大于0.05因此认为样本x来自正态总体。
+
+通过比较经验分布函数与总体分布函数之间的差异来判断样本是否来自某个总体的方法
+成为经验分布拟合检验。
+Kolmogorov-Smirnov统计量是计算经验分布函数与总体分布函数的距离$D$，即
+\[D=\sup_{-\infty<x<+\infty} \left| F_n(x)-F_0(x) \right|\]
+R语言提供ks.test函数进行Kolmogorov-Smirnov检验，
+在Sage中为r.ks\_test。
+\begin{sageblock}
+dtest=r.ks_test(x,"pnorm",x.mean(),x.sd())
+\end{sageblock}
+最后检验结果的p值为
+\[\textrm{dtest.\_sage\_()['DATA']['p\_value']}=\sage{dtest._sage_()['DATA']['p_value']}\]
+大于0.05因此认为样本x来自正态总体。
+
+\subsubsection{参数估计}
+参数估计主要有点估计和区间估计两种。
+点估计主要有矩估计和似然估计，其优点是直接得到待估参数的值，
+但其缺点是无法得到估计的精确性和可信程度。
+区间估计是确定在某个置信度（如1-0.05）下，待估参数可能的区间范围。
+以下主要介绍区间估计。
+
+对于一个正态总体$X$均值$\mu$的区间估计，当方差$\sigma^2$已知时，
+$\mu$的置信度为$1-\alpha$的双侧置信区间为
+\[\left[ \bar{X}-\frac{\sigma}{\sqrt{n}}Z_{\alpha/2},\bar{X}+\frac{\sigma}{\sqrt{n}}Z_{\alpha/2} \right]\]
+使用上上小节的样本x，假设其总体方差已知恰与样本方差相同，
+用如下代码计算$\mu$的置信度为1-0.05的置信区间
+\begin{sageblock}
+left=x.mean()-x.sd()/(x.length().sqrt()*r.qnorm(1-0.05/2))
+right=x.mean()+x.sd()/(x.length().sqrt()*r.qnorm(1-0.05/2))
+\end{sageblock}
+计算结果样本x的置信度为0.05的$\mu$的置信区间为$(\sage{left._sage_()},\sage{right._sage_()})$。
+
+对于方差未知的正态总体$X$，$\mu$的置信度为$1-\alpha$的双侧置信区间为
+\[\left[ \bar{X}-\frac{S}{\sqrt{n}}t_{\alpha/2}(n-1),\bar{X}+\frac{S}{\sqrt{n}}t_{\alpha/2}(n-1) \right]\]
+对于这种情况R语言提供了t.test函数可以完成区间估计，
+在Sage中使用r.t\_test调用，
+如要计算上上小节的样本x的置信度为1-0.05的$\mu$的置信区间可以使用如下代码
+\begin{sageblock}
+xttest=r.t_test(x,conf_level=1-0.05)
+\end{sageblock}
+最终计算结果为$\textrm{xttest.\_sage\_()['DATA']['conf\_int']['DATA']}=\sage{xttest._sage_()['DATA']['conf_int']['DATA']}$。
+
+对于方差的区间估计同样分两种情况。
+
+1. 当总体均值$\mu$已知时，方差$\sigma^2$的置信度为$1-\alpha$的置信区间为
+\[\left[ \frac{n\hat{\sigma}^2}{\chi_{\alpha/2}^2(n)},\frac{n\hat{\sigma}^2}{\chi_{1-\alpha/2}^2(n)} \right]\]
+其中$\hat{\sigma^2}=\frac{1}{n}\sum_{i=1}^n(X_i-\mu)^2$，
+假设上上小节的样本x的总体均值恰与样本均值相同，
+用如下代码计算$\sigma$的置信度为0.05的双侧置信区间
+\begin{sageblock}
+varhat=((x-x.mean())^2).mean()
+varleft=x.length()*varhat/r.qchisq(1-0.05/2,x.length())
+varright=x.length()*varhat/r.qchisq(0.05/2,x.length())
+\end{sageblock}
+最终计算结果为$(\sage{varleft._sage_()},\sage{varright._sage_()})$。
+
+2. 当总体均值$\mu$未知时，方差$\sigma^2$的置信度为$1-\alpha$的置信区间为
+\[\left[ \frac{(n-1)S^2}{\chi_{\alpha/2}^2(n-1)},\frac{(n-1)S^2}{\chi_{1-\alpha/2}^2(n-1)} \right]\]
+其中$S^2=\frac{1}{n-1}\sum_{i=1}^n(X_i-\bar{X})^2$，
+如果要计算上上小节样本x的置信度为0.05的双侧置信区间可以使用如下代码
+\begin{sageblock}
+sleft=(x.length()-1)*x.var()/r.qchisq(1-0.05/2,x.length()-1)
+sright=(x.length()-1)*x.var()/r.qchisq(0.05/2,x.length()-1)
+\end{sageblock}
+最终计算结果为$(\sage{sleft._sage_()},\sage{sright._sage_()})$。
+
+对于两个正态总体$X,Y$，分三种情况讨论均值差$\mu_1-\mu_2$的区间估计
+
+1. 当两总体的方差$\sigma_1^2,\sigma_2^2$已知时，
+$\mu_1-\mu_2$的置信度为$1-\alpha$的双侧置信区间为
+\[\left[
+\bar{X}-\bar{Y}-Z_{\alpha/2}\sqrt{\frac{\sigma_1^2}{n_1}+\frac{\sigma_2^2}{n_2^2}},
+\bar{X}-\bar{Y}+Z_{\alpha/2}\sqrt{\frac{\sigma_1^2}{n_1}+\frac{\sigma_2^2}{n_2^2}}
+\right]\]
+
+2. 当两总体的方差未知，但相同时，
+$\mu_1-\mu_2$的置信度为$1-\alpha$的双侧置信区间为
+\[\left[
+\bar{X}-\bar{Y}-t_{\alpha/2}(n_1+n_2-2)S_w\sqrt{\frac{1}{n_1}+\frac{1}{n_2}},
+\bar{X}-\bar{Y}+t_{\alpha/2}(n_1+n_2-2)S_w\sqrt{\frac{1}{n_1}+\frac{1}{n_2}}
+\right]\]
+其中$S_w=\sqrt{\frac{(n_1-1)S_1^2+(n_2-1)S_2^2}{n_1+n_2-2}}$
+
+3. 当两总体的方差未知，且不相同时，
+$\mu_1-\mu_2$的置信度为$1-\alpha$的双侧置信区间近似地为
+\[\left[
+\bar{X}-\bar{Y}-t_{\alpha/2}(\hat{v})\sqrt{\frac{S_1^2}{n_1}+\frac{S_2^2}{n_2}}),
+\bar{X}-\bar{Y}+t_{\alpha/2}(\hat{v})\sqrt{\frac{S_1^2}{n_1}+\frac{S_2^2}{n_2}})
+\right]\]
+其中
+\[\hat{v}=(\frac{S_1^2}{n_1}+\frac{S_2^2}{n_2})^2/
+(\frac{(S_1^2)^2}{n_1^2(n_1-1)}+\frac{(S_2^2)^2}{n_2^2(n_2-1)})\]
+
+对于上述第一种情形可以使用简单的R语言语句求解，
+对于第二和第三种情形可以使用R语言的t.test函数，
+在Sage中使用r.t\_test调用，
+例如下面的代码首先在上上小节的样本x的基础上，
+加了一个正态的噪音，然后进行上述检验，
+理论上二者的均值应当是差不多的，
+但方差不同，因此进行方差不同的检验
+\begin{sageblock}
+y=x+r.rnorm(x.length())
+varneqtest=r.t_test(x,y,conf_level=1-0.05,var_equal=False)
+\end{sageblock}
+最后结果为
+$\textrm{varneqtest.\_sage\_()['DATA']['conf\_int']['DATA']}=
+\sage{varneqtest._sage_()['DATA']['conf_int']['DATA']}$，
+置信区间包含了0,因此二者的均值没有明显差别。
+事实上x的均值为$\sage{x.mean()._sage_()}$，
+y的均值为$\sage{y.mean()._sage_()}$，
+二者相差无几。
+
+对于配对的拘束，如上面的x和y可以通过配对做差，
+将两个总体均值差的区间估计，转化但总体均值的区间估计，
+这里同样可以分为差值的方差已知和差值的方差未知两种情况，不再赘述。
+用如下代码计算上面的配对数据的区间估计（与r.t\_test(x-y)等价）
+\begin{sageblock}
+paired=r.t_test(x,y,conf_level=1-0.05,paired=True)
+\end{sageblock}
+最终计算结果为
+$\textrm{paired.\_sage\_()['DATA']['conf\_int']['DATA']}=
+\sage{paired._sage_()['DATA']['conf_int']['DATA']}$
+
+两样本的方差比$\sigma_1^2/\sigma_2^2$的区间估计，
+分为总体均值已知和总体均值未知两种情况。
+
+1. 总体均值$\mu_1,\mu_2$已知，
+此时$\sigma_1^2/\sigma_2^2$的置信度$1-\alpha$的置信区间为
+\[\left[ \frac{\hat{\sigma_1}^2/\hat{\sigma_2}^2}{F_{\alpha/2}(n_1,n_2)},
+\frac{\hat{\sigma_1}^2/\hat{\sigma_2}^2}{F_{1-\alpha/2}(n_1,n_2)} \right]\]
+
+2. 总体均值$\mu_1,\mu_2$未知，
+此时$\sigma_1^2/\sigma_2^2$的置信度$1-\alpha$的置信区间为
+\[\left[\frac{S_1^2/S_2^2}{F_{\alpha/2}(n_1-1,n_2-1)},
+\frac{S_1^2/S_2^2}{F_{1-\alpha/2}(n_1-1,n_2-1)}\right]\]
+
+对于总体均值已知的情形可以通过简单的R语言语句计算，
+对于总体均值未知的情形R语言提供了var.test函数，
+在Sage中使用r.var\_test调用，
+用如下代码计算样本x和样本y的方差比的区间估计
+\begin{sageblock}
+mudontknow=r.var_test(x,y)
+\end{sageblock}
+最终结果为
+$\textrm{mudontknow.\_sage\_()['DATA']['conf\_int']['DATA']}=
+\sage{mudontknow._sage_()['DATA']['conf_int']['DATA']}$。
+
+对于非正态总体$X$根据中心极限定理，对充分大的n，
+其均值$\mu$的置信度为$1-\alpha$的双侧置信区间近似地为
+\[\left[ \bar{X}-\frac{\sigma}{\sqrt{n}}Z_{\alpha/2},\bar{X}+\frac{\sigma}{\sqrt{n}}Z_{\alpha/2} \right]\]
+若$\sigma^2$未知，则用$S^2$代替。
 

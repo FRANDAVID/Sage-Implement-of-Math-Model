@@ -8,6 +8,12 @@
 这个过程叫做拟合。内插是曲线必须通过已知点的拟合。
 
 \subsection{Sage实现}
+这部分内容主要参考以下链接
+
+\href{http://www.sagemath.org/doc/reference/numerical/sage/numerical/optimize.html}{http://www.sagemath.org/doc/reference/numerical/sage/numerical/optimize.html}
+
+\href{http://www.sagemath.org/doc/reference/calculus/sage/gsl/interpolation.html}{http://www.sagemath.org/doc/reference/calculus/sage/gsl/interpolation.html}
+
 \subsubsection{样条插值}
 Sage实现样条插值可以使用spline函数，
 如下面的代码，将要进行插值的样本点列表传给spline函数即可，
