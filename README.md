@@ -1,6 +1,15 @@
+声明
+====
+本“书”只是作者的学习笔记对内容的正确性与完整性无法保证。
+目前本“书”尚未完成想预览的可以到
+[我的百度网盘](http://pan.baidu.com/s/1bn6Jxkr)下载。  
+关于Sage的书可以看Gregory Bard今年在AMS出版的书《Sage for Undergraduates》，
+可以在
+[这里](http://www.gregorybard.com/sage_for_undergraduates_color.pdf.zip)下载。
+
 数学模型的Sage实现
 ==================
-本书籍包含以下内容  
+本“书”包含以下内容  
 1. 混合整数线性规划  
 2. 非线性规划  
 3. 动态规划  
@@ -32,7 +41,7 @@
 29. 作业计划  
 30. 其他  
 
-获得本书
+获得本“书”
 --------
 不想或不能安装LaTeX，SageTeX和Sage的请看后文SageCloud部分。  
 1. 安装LaTeX，SageTeX和Sage。  
@@ -50,7 +59,7 @@ git clone https://github.com/CAU-Free-Software-Club/Sage-Implement-of-Math-Model
 cd Sage-Implement-of-Math-Model && make
 ~~~
 
-想要帮助完善本书？
+想要帮助完善本“书”？
 ---------------------
 
 fork本项目或者提交pull request
